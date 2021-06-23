@@ -18,17 +18,29 @@ display in white "`outcome' `exposure' "
 	marksample touse
 	
 	preserve
-	local covarlist=subinstr("`covar'", "i.", "" ,.)
-	local keepvarlist=subinstr("`keepvar'", "i.", "" ,.)
-	local expvarlist=subinstr("`exposure'", "i.", "" ,.)
+	local covarlist=subinstr("`covar'", "##", " " ,.)
+	local covarlist=subinstr("`covarlist'", "#", " " ,.)
+	local covarlist=subinstr("`covarlist'", "i.", "" ,.)
+	local covarlist=subinstr("`covarlist'", "c.", "" ,.)
+	local covarlist: list uniq covarlist
 	
+	local keepvarlist=subinstr("`keepvar'", "##", " " ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "#", " " ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "i.", "" ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "c.", "" ,.)
+	local keepvarlist: list uniq keepvarlist
+	
+	local expvarlist=subinstr("`exposure'", "##", " " ,.)
+	local expvarlist=subinstr("`expvarlist'", "#", " " ,.)
+	local expvarlist=subinstr("`expvarlist'", "i.", "" ,.)
+	local expvarlist=subinstr("`expvarlist'", "c.", "" ,.)
+	local expvarlist: list uniq expvarlist
+
 	*dropmiss `outcome' `expvarlist' `keepvarlist'  `covarlist', obs any force
 	
 	tempvar missx
 	egen `missx'=rowmiss(`outcome' `expvarlist' `keepvarlist'  `covarlist')
 	drop if `missx'>0
-	
-	
 	
 	if "`stat'"~="AIC" & "`stat'"~="BIC" {
 		display as err "option stat() invalid. Only AIC and BIC supported at this time"
