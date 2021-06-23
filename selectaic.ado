@@ -4,11 +4,13 @@
 /*modified to change the "show" option to only show final model and mata output*/
 /*modified 8/17/16 to use egen, rowmiss instead of dropmiss as drop miss has been replaced without similar functionality)*/
 /*modified 1/27/17 to correctly account when no variables meet critiria*/
+/*modified 6/23/2021 to change outcome, exposure and keepvar to varlist and allow for factor variables and changed error code if not AIC or BIC*/
+
 
 capture program drop selectaic
 program selectaic, rclass
 version 11.1
-syntax  namelist(max=1) [if] [in], outcome(string) [exposure(string)] stat(string) [keepvar(string)] [covar(varlist fv)] [options(string)] [show]
+syntax  namelist(max=1) [if] [in], outcome(varlist fv) [exposure(varlist fv)] stat(string) [keepvar(varlist fv)] [covar(varlist fv)] [options(string)] [show]
 display in white "`outcome' `exposure' "
 
 	clear mata
@@ -29,7 +31,8 @@ display in white "`outcome' `exposure' "
 	
 	
 	if "`stat'"~="AIC" & "`stat'"~="BIC" {
-		di "`stat'" not supported at this time
+		display as err "option stat() invalid. Only AIC and BIC supported at this time"
+   		 exit 198
 		}
 	
 	
