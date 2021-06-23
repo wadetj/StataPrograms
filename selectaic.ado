@@ -4,11 +4,13 @@
 /*modified to change the "show" option to only show final model and mata output*/
 /*modified 8/17/16 to use egen, rowmiss instead of dropmiss as drop miss has been replaced without similar functionality)*/
 /*modified 1/27/17 to correctly account when no variables meet critiria*/
+/*modified 6/23/2021 to change outcome, exposure and keepvar to varlist and allow for factor variables and changed error code if not AIC or BIC*/
+
 
 capture program drop selectaic
 program selectaic, rclass
 version 11.1
-syntax  namelist(max=1) [if] [in], outcome(string) [exposure(string)] stat(string) [keepvar(string)] [covar(varlist fv)] [options(string)] [show]
+syntax  namelist(max=1) [if] [in], outcome(varlist fv) [exposure(varlist fv)] stat(string) [keepvar(varlist fv)] [covar(varlist fv)] [options(string)] [show]
 display in white "`outcome' `exposure' "
 
 	clear mata
@@ -16,20 +18,33 @@ display in white "`outcome' `exposure' "
 	marksample touse
 	
 	preserve
-	local covarlist=subinstr("`covar'", "i.", "" ,.)
-	local keepvarlist=subinstr("`keepvar'", "i.", "" ,.)
-	local expvarlist=subinstr("`exposure'", "i.", "" ,.)
+	local covarlist=subinstr("`covar'", "##", " " ,.)
+	local covarlist=subinstr("`covarlist'", "#", " " ,.)
+	local covarlist=subinstr("`covarlist'", "i.", "" ,.)
+	local covarlist=subinstr("`covarlist'", "c.", "" ,.)
+	local covarlist: list uniq covarlist
 	
+	local keepvarlist=subinstr("`keepvar'", "##", " " ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "#", " " ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "i.", "" ,.)
+	local keepvarlist=subinstr("`keepvarlist'", "c.", "" ,.)
+	local keepvarlist: list uniq keepvarlist
+	
+	local expvarlist=subinstr("`exposure'", "##", " " ,.)
+	local expvarlist=subinstr("`expvarlist'", "#", " " ,.)
+	local expvarlist=subinstr("`expvarlist'", "i.", "" ,.)
+	local expvarlist=subinstr("`expvarlist'", "c.", "" ,.)
+	local expvarlist: list uniq expvarlist
+
 	*dropmiss `outcome' `expvarlist' `keepvarlist'  `covarlist', obs any force
 	
 	tempvar missx
 	egen `missx'=rowmiss(`outcome' `expvarlist' `keepvarlist'  `covarlist')
 	drop if `missx'>0
 	
-	
-	
 	if "`stat'"~="AIC" & "`stat'"~="BIC" {
-		di "`stat'" not supported at this time
+		display as err "option stat() invalid. Only AIC and BIC supported at this time"
+   		 exit 198
 		}
 	
 	
