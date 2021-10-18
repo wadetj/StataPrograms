@@ -2,6 +2,7 @@
 zero and base for factors*/
 /*1-19-2011 - allows no wade option to treat all unexposed as non swimmers*/
 /*1/31/2011-corrected so glm saves a single record for each exposure, before was producing inconsistent results*/
+/*10-14-2021-removed "xi" prefix and other changes*/
 
 
 capture program drop armodels
@@ -42,7 +43,7 @@ save `data', replace
  
  if "`model'"=="glmame" {
 	tempname m1
-	xi: glm `outcome' `exp' `swimtemp' `covar' if `touse', `options' family(binomial) link(identity)
+	glm `outcome' `exp' `swimtemp' `covar' if `touse', `options' family(binomial) link(identity)
 	estimates store `m1'
 	*predictnl `namelist'=_b[`swimtemp']*`swimtemp'+_b[`exp']*`exp', ci(`namelist'lo `namelist'up) se(`namelist'se)
 	tempfile `namelist'
@@ -69,7 +70,7 @@ if "`save'"~="" {
 
  if "`model'"=="glm" {
 	tempname m1
-	xi: glm `outcome' `exp' `swimtemp' `covar' if `touse', `options' family(binomial) link(identity)
+	glm `outcome' `exp' `swimtemp' `covar' if `touse', `options' family(binomial) link(identity)
 	estimates store `m1'
 	predictnl ar =_b[`swimtemp']*`swimtemp'+_b[`exp']*`exp' if e(sample), ci(arlo arup) se(arse)
 	keep if `swimtemp'==1
@@ -91,7 +92,7 @@ if "`save'"~="" {
 
  if "`model'"=="logit" {
 	tempname m1
-	xi: logit `outcome' `exp' `swimtemp' `covar' if `touse', `options'
+	logit `outcome' `exp' `swimtemp' `covar' if `touse', `options'
 	estimates store `m1'
 	tempfile `namelist'
 	tempname xfile
@@ -113,15 +114,11 @@ if "`save'"~="" {
 
 }
 
-	
-
-	
-	
 		
 
  if "`model'"=="logitame" {
 	tempname m1
-	xi: logit `outcome' `exp' `swimtemp' `covar' if `touse', `options'
+	logit `outcome' `exp' `swimtemp' `covar' if `touse', `options'
 	estimates store `m1'
 	tempfile `namelist'
 	tempname xfile
@@ -148,7 +145,7 @@ if "`save'"~="" {
 	tempname m1
 	tempvar beachnum
 	encode beach, gen(`beachnum')
-	xtmelogit `outcome' `exp' `swimtemp' `covar' || `beachnum': if `touse', `options'
+	xtmelogit `outcome' `exp' `swimtemp' `covar' if `touse' || `beachnum': , `options'
 	estimates store `m1'
 	tempfile `namelist'
 	tempname xfile
@@ -175,4 +172,3 @@ if "`save'"~="" {
  
  
  
-
