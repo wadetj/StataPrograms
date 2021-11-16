@@ -1,39 +1,25 @@
 
-*generates histogram following fmm model
-*no adjustment allowed
+
 
 capture program drop fmmplot
 program define fmmplot
 version 17.0
 
-syntax varlist(max=1), [levels(integer 2)] [plotoptions(string)] [adjust]
+syntax varlist(max=1), [levels(integer 2)] [plotoptions(string)] 
 
 if `levels'==2 {
-	if "`adjust'"=="" {
-		matrix b=e(b)
-		local m1=b[1,3]
-		local m2=b[1,4]
-		local v1=b[1,5]
-		local v2=b[1,6]
 	
-	}
-	
-	if "`adjust'"~="" {
-		qui estat lcmean
-		matrix b=r(b)
-		local m1=b[1,1]
-		local m2=b[1,2]
-		matrix V=r(V)
-		local v1=V[1,1]
-		local v2=V[2,2]
-	}
-	
+	matrix b=e(b)
+	local m1=b[1,3]
+	local m2=b[1,4]
+	local v1=b[1,5]
+	local v2=b[1,6]
+
 	local s1=sqrt(`v1')
 	local s2=sqrt(`v2')
 
-	
 	qui estat lcprob
-	
+		
 	matrix p=r(b)
 	local p1=p[1,1]
 	local p2=p[1,2]
@@ -48,33 +34,15 @@ if `levels'==2 {
 
 
 if `levels'==3 {
+
+	matrix b=e(b)
 	
-	if "`adjust'"=="" {
-		
-		matrix b=e(b)
-	
-		local m1=b[1,4]
-		local m2=b[1,5]
-		local m3=b[1,6]
-		local v1=b[1,7]
-		local v2=b[1,8]
-		local v3=b[1,9]
-	}
-	
-	if "`adjust'"~="" {
-		qui estat lcmean
-		matrix b=r(b)
-		local m1=b[1,1]
-		local m2=b[1,2]
-		local m3=b[1,3]
-		
-		matrix V=r(V)
-		local v1=V[1,1]
-		local v2=V[2,2]
-		local v3=V[3,3]
-		
-	}
-	
+	local m1=b[1,4]
+	local m2=b[1,5]
+	local m3=b[1,6]
+	local v1=b[1,7]
+	local v2=b[1,8]
+	local v3=b[1,9]	
 	
 	local s1=sqrt(`v1')
 	local s2=sqrt(`v2')
@@ -96,7 +64,8 @@ if `levels'==3 {
 }
 
 
-end	
+end
+
 
 *fmm 2: regress lhev
 *fmmplot lhev
