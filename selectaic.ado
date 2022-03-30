@@ -1,4 +1,4 @@
-*Author: Tim Wade wadetj@gmail.com*/
+/*Author: Tim Wade wadetj@gmail.com*/
 /*Purpose: Run model to use backward selection to select lowest aic or bic*/
 /*renamed to selectaic 5/9/2011*/
 /*modified to change the "show" option to only show final model and mata output*/
