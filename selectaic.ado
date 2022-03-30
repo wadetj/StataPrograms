@@ -5,7 +5,7 @@
 /*modified 8/17/16 to use egen, rowmiss instead of dropmiss as drop miss has been replaced without similar functionality)*/
 /*modified 1/27/17 to correctly account when no variables meet critiria*/
 /*modified 6/23/2021 to change outcome, exposure and keepvar to varlist and allow for factor variables and changed error code if not AIC or BIC*/
-
+/*modified 3/30/2022 to allow lower case AIC/BIC in stat option*/
 
 capture program drop selectaic
 program selectaic, rclass
@@ -42,7 +42,9 @@ display in white "`outcome' `exposure' "
 	egen `missx'=rowmiss(`outcome' `expvarlist' `keepvarlist'  `covarlist')
 	drop if `missx'>0
 	
-	if "`stat'"~="AIC" & "`stat'"~="BIC" {
+	local stat=strlower("`stat'")
+	
+	if "`stat'"~="aic" & "`stat'"~="bic" {
 		display as err "option stat() invalid. Only AIC and BIC supported at this time"
    		 exit 198
 		}
@@ -55,12 +57,12 @@ display in white "`outcome' `exposure' "
 	qui: estat ic
  	matrix XX=r(S)
  	
-	if "`stat'"=="AIC" {
+	if "`stat'"=="aic" {
 		local full=XX[1, 5]
 		}
 		
 		
-	if "`stat'"=="BIC" {
+	if "`stat'"=="bic" {
 		local full=XX[1, 6]
 		}
  	
@@ -112,12 +114,12 @@ display in white "`outcome' `exposure' "
 		
 			matrix ZZ=r(S)
 		
-			if "`stat'"=="AIC" {
+			if "`stat'"=="aic" {
 				local x=ZZ[1, 5]
 			}
 		
 		
-			if "`stat'"=="BIC" {
+			if "`stat'"=="bic" {
 				local x=ZZ[1, 6]
 			}
 		
@@ -183,12 +185,12 @@ display in white "`outcome' `exposure' "
  	
  		matrix YY=r(S)
 		
-		if "`stat'"=="AIC" {
+		if "`stat'"=="aic" {
 			local full=YY[1, 5]
 		}
 		
 		
-		if "`stat'"=="BIC" {
+		if "`stat'"=="bic" {
 			local full=YY[1, 6]
 		}
  	
@@ -228,5 +230,6 @@ estat ic
 clear mata
 
 end
+
 
 
