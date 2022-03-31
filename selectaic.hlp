@@ -1,0 +1,80 @@
+.-
+help for ^selectaic^                             (Timothy J. Wade)
+.-
+
+Stepwise regression model selection using the AIC or BIC statistic
+
+     ^selectaic^ (regcmd) [if] [in], outcome(varlist fv) [exposure(varlist fv)] stat(string) [keepvar(varlist fv)] [covar(varlist fv)] [options(string)] [show]	
+
+Description
+-----------
+
+^selectaic^ conducts model selection regression command specified in ^regcmd^ minimizing the Akaike's Information Criterion (AIC)
+ or Schwarz's Bayesian Information Criterion (BIC) statistic. Backwards stepwise model selection of variables specified in ^covar^ to achieve
+ the set of covariates that minimizes the AIC 
+
+^regcmd^ may be any standard regression command such as ^reg^, ^logit^, ^poisson^. Currently ^selectaic^ has not
+been developed or tested for mixed or hierarchical models using ^xt-^.
+
+Options
+----------
+^outcome^ : Required. Outcome variable in regression model
+
+^stat^	  : Required. Specify AIC/aic or BIC/bic
+
+^exposure^: Optional.  Exposure or predictor variable of interest- retained in the final model regardless if impact on AIC or BIC
+
+^covar^   : Optional. List of variables to select from, separated by space
+
+^keepvar^ : Optional. Variables to keep in all models
+
+^show^	  : Shows detailed output from each model. Default is only to show variable selection at each stage.
+
+^options^ : Allows additional options specific to the regression command. For example options(vce(cluster hh))
+	    would produce robust cluster standard errors on the clustering variable hh
+	   
+Remarks
+-------
+^selectaic^ uses backwards selection approach to select the best fitting model from a set of variables based on minimizing the AIC or BIC.
+Variable expansion using standard Stata syntax is accepted in the ^outcome^, ^exposure^ and ^covar^ options. The final list of selected
+variables is stored in ^r(covarlist)^.
+
+AIC and BIC statistics are only valid when the number of observations is unchanged across models. Observations with missing values
+on variables specified in the model are temporarily dropped during the model selection procedure. The original data set is 
+restored upon completion.
+
+
+Examples
+--------
+
+ . ^sysuse auto.dta^
+
+ . ^selectaic logit,  outcome(foreign) covar(price weight length turn mpg) stat(bic)^
+ 
+ . ^selectaic reg,  outcome(price) exposure(foreign) covar(weight length turn) stat(aic)^
+ 
+ . ^selectaic logit, outcome(foreign) exposure( mpg) covar( rep78 headroom trunk weight length turn) keepvar(price) stat(bic)^
+ 
+ . ^egen group3=cut(mpg), group(3)^
+
+ . ^selectaic logit, outcome(foreign) exposure(mpg) covar(i.group3 price) stat(aic)^
+ 
+ . ^selectaic reg, outcome(price) exposure(i.foreign##c.weight) covar( turn length mpg) stat(aic)^
+ 
+
+Stored results
+--------------
+
+^selectaic^ stores the final variable list in ^r(covarlist)^.
+
+Author
+------
+
+Timothy J. Wade (wadetj@gmail.com, https://github.com/wadetj)
+
+Also see
+--------
+
+^[R] estat ic^
+
+
