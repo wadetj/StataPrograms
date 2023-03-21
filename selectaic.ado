@@ -6,6 +6,7 @@
 /*modified 1/27/17 to correctly account when no variables meet critiria*/
 /*modified 6/23/2021 to change outcome, exposure and keepvar to varlist and allow for factor variables and changed error code if not AIC or BIC*/
 /*modified 3/30/2022 to allow lower case AIC/BIC in stat option*/
+/*modified 3/30/2023 to correct error for models that don't select any covariates-unadjusted models were not rerun on full dataset*/
 
 capture program drop selectaic
 program selectaic, rclass
