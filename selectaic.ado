@@ -85,6 +85,7 @@ display in white "`outcome' `exposure' "
 			
 			if `qqq'<1 {
 				di in yellow "no variables selected -displaying unadjusted model"	
+				restore
 				`namelist' `outcome' `exposure' `keepvar' if `touse', `options'	
 				exit
 			}
